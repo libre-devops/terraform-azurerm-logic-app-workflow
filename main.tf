@@ -1,5 +1,5 @@
 resource "azurerm_logic_app_workflow" "workflows" {
-  for_each = {for app in var.logic_app_workflows : app.name => app}
+  for_each = { for app in var.logic_app_workflows : app.name => app }
 
   location                           = each.value.location
   name                               = each.value.name
@@ -56,8 +56,7 @@ resource "azurerm_logic_app_workflow" "workflows" {
               name = open_authentication_policy.value.name
 
               dynamic "claim" {
-                for_each = open_authentication_policy.value.claim != null ? [open_authentication_policy.value.claim] :
-                  []
+                for_each = open_authentication_policy.value.claim != null ? [open_authentication_policy.value.claim] : []
                 content {
                   name  = claim.value.name
                   value = claim.value.value
