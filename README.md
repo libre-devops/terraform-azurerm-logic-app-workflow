@@ -52,8 +52,7 @@ resource "azurerm_logic_app_workflow" "workflows" {
           allowed_caller_ip_address_range = trigger.value.allowed_caller_ip_address_range
 
           dynamic "open_authentication_policy" {
-            for_each = trigger.value.open_authentication_policy != null ? [trigger.value.open_authentication_policy] :
-              []
+            for_each = trigger.value.open_authentication_policy != null ? [trigger.value.open_authentication_policy] : []
             content {
               name = open_authentication_policy.value.name
 
