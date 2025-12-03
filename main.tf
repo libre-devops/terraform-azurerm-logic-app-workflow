@@ -10,8 +10,8 @@ resource "azurerm_logic_app_workflow" "workflows" {
   enabled                            = each.value.enabled
   workflow_parameters                = each.value.workflow_parameters
   workflow_version                   = each.value.workflow_version
+  workflow_schema                    = each.value.workflow_schema
   parameters                         = each.value.parameters
-
 
   dynamic "identity" {
     for_each = each.value.identity_type == "SystemAssigned" ? [each.value.identity_type] : []
