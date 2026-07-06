@@ -1,0 +1,26 @@
+{
+  "description": "Try block: POST the storm summary to the on-call webhook with an explicit exponential retry policy; the catch action runs only if every retry fails.",
+  "type": "Scope",
+  "actions": {
+    "HTTP_-_POST_storm_summary_to_the_on_call_webhook": {
+      "description": "Sends the composed storm summary. The retry policy is explicit, never the silent default: exponential backoff, count from @parameters('notify_retry_count').",
+      "type": "Http",
+      "inputs": {
+        "method": "POST",
+        "uri": "@parameters('notify_webhook_url')",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "@outputs('${summary_action_name}')",
+        "retryPolicy": {
+          "type": "exponential",
+          "count": "@parameters('notify_retry_count')",
+          "interval": "PT10S",
+          "maximumInterval": "PT1M"
+        }
+      },
+      "runAfter": {}
+    }
+  },
+  "runAfter": {}
+}

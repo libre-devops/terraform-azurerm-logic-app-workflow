@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaId": { "type": "string" },
+    "data": {
+      "type": "object",
+      "properties": {
+        "essentials": {
+          "type": "object",
+          "properties": {
+            "alertId": { "type": "string" },
+            "alertRule": { "type": "string" },
+            "severity": { "type": "string" },
+            "monitorCondition": { "type": "string" },
+            "firedDateTime": { "type": "string" },
+            "description": { "type": "string" }
+          }
+        },
+        "alertContext": { "type": "object" }
+      }
+    }
+  }
+}

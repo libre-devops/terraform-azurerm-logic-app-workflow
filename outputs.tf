@@ -1,59 +1,54 @@
-output "logic_app_workflow_access_endpoints" {
-  description = "The Access Endpoints for the Logic App Workflows."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.access_endpoint }
+output "access_endpoints" {
+  description = "Map of workflow name to its access endpoint."
+  value       = { for k, v in azurerm_logic_app_workflow.this : k => v.access_endpoint }
 }
 
-output "logic_app_workflow_connector_endpoint_ip_addresses" {
-  description = "The list of access endpoint IP addresses of connector."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.connector_endpoint_ip_addresses }
+output "connector_outbound_ip_addresses" {
+  description = "Map of workflow name to the outbound IPs its managed connectors call from (for allow-listing on downstream firewalls)."
+  value       = { for k, v in azurerm_logic_app_workflow.this : k => v.connector_outbound_ip_addresses }
 }
 
-output "logic_app_workflow_connector_outbound_ip_addresses" {
-  description = "The list of outgoing IP addresses of connector."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.connector_outbound_ip_addresses }
+output "identities" {
+  description = "Map of workflow name to its identity { principal_id, tenant_id } (principal_id is populated for system-assigned identities), for role assignments."
+  value = {
+    for k, v in azurerm_logic_app_workflow.this : k => try({
+      principal_id = v.identity[0].principal_id
+      tenant_id    = v.identity[0].tenant_id
+    }, null)
+  }
 }
 
-output "logic_app_workflow_endpoint_ip_addresses" {
-  description = "The list of access endpoint IP addresses of workflow."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.workflow_endpoint_ip_addresses }
+output "ids" {
+  description = "Map of workflow name to its resource id."
+  value       = { for k, v in azurerm_logic_app_workflow.this : k => v.id }
 }
 
-output "logic_app_workflow_identity" {
-  description = "The identities for the Logic App Workflows."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.identity }
+output "ids_zipmap" {
+  description = "Map of workflow name to a { name, id } object, for passing where both are needed together."
+  value       = { for k, v in azurerm_logic_app_workflow.this : k => { name = v.name, id = v.id } }
 }
 
-output "logic_app_workflow_ids" {
-  description = "The Logic App Workflow IDs."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.id }
+output "names" {
+  description = "The workflow names."
+  value       = keys(azurerm_logic_app_workflow.this)
 }
 
-output "logic_app_workflow_names" {
-  description = "The Logic App Workflow names"
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.name }
+output "resource_group_name" {
+  description = "Resource group name parsed from resource_group_id."
+  value       = local.rg_name
 }
 
-output "logic_app_workflow_outbound_ip_addresses" {
-  description = "The list of outgoing IP addresses of workflow."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.workflow_outbound_ip_addresses }
+output "subscription_id" {
+  description = "Subscription id parsed from resource_group_id."
+  value       = local.rg.subscription_id
 }
 
-output "logic_app_workflow_principal_ids" {
-  description = "The Principal IDs for the Service Principal associated with the Managed Service Identity of this Logic App Workflow."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => try(workflow.identity[0].principal_id, null) }
+output "tags" {
+  description = "The base tags applied to the workflows."
+  value       = var.tags
 }
 
-output "logic_app_workflow_rg_names" {
-  description = "The Logic App Workflow resource group names"
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.resource_group_name }
-}
-
-output "logic_app_workflow_tags" {
-  description = "The Logic App Workflow resource group names"
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => workflow.tags }
-}
-
-output "logic_app_workflow_tenant_ids" {
-  description = "The Tenant IDs for the Service Principal associated with the Managed Service Identity of this Logic App Workflow."
-  value       = { for name, workflow in azurerm_logic_app_workflow.workflows : name => try(workflow.identity[0].tenant_id, null) }
+output "workflow_outbound_ip_addresses" {
+  description = "Map of workflow name to the outbound IPs the workflow runtime calls from (for allow-listing on downstream firewalls)."
+  value       = { for k, v in azurerm_logic_app_workflow.this : k => v.workflow_outbound_ip_addresses }
 }
