@@ -43,7 +43,7 @@ What the shell earns:
   them by key, and `use_shared_connections = false` opts out. The module generates the entire
   `$connections` parameter pair, including the `ManagedServiceIdentity` authentication block, byte
   compatible with `@parameters('$connections')['<api>']['connectionId']` references.
-- **Diagnostics declared once**: `diagnostics_log_analytics_workspace_id` gives every workflow an
+- **Diagnostics declared once**: `diagnostics` gives every workflow an
   allLogs diagnostic setting named `diag-<workflow>`, with per-workflow override and opt-out.
 - **The hidden-title tag is required**: `title` becomes the portal subtitle, as the standard
   mandates.
@@ -86,7 +86,7 @@ module "playbooks" {
       managed_identity_auth = true
     }
   }
-  diagnostics_log_analytics_workspace_id = module.law.workspace_ids["log-ldo-uks-prd-001"]
+  diagnostics = { log_analytics_workspace_id = module.law.workspace_ids["log-ldo-uks-prd-001"] }
 
   workflows = local.playbooks
 }
@@ -168,7 +168,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_diagnostics_log_analytics_workspace_id"></a> [diagnostics\_log\_analytics\_workspace\_id](#input\_diagnostics\_log\_analytics\_workspace\_id) | When set, every workflow gets an allLogs diagnostic setting to this workspace (named diag-<workflow>) unless it sets its own diagnostics or opts out with diagnostics\_enabled = false. | `string` | `null` | no |
+| <a name="input_diagnostics"></a> [diagnostics](#input\_diagnostics) | Module-level default diagnostics: when set, every workflow gets an allLogs diagnostic setting to this workspace (named diag-<workflow>) unless it sets its own diagnostics or opts out with diagnostics\_enabled = false. An object rather than a bare string so its presence stays plan-known when the workspace is created in the same apply (for\_each keys must never depend on unknown values). | <pre>object({<br/>    log_analytics_workspace_id = string<br/>  })</pre> | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region for the workflows. | `string` | n/a | yes |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | Resource id of the resource group the workflows are created in. The resource group name and subscription are parsed from this id. | `string` | n/a | yes |
 | <a name="input_shared_connections"></a> [shared\_connections](#input\_shared\_connections) | API connections shared by every workflow in the call (the usual estate shape: the same Sentinel/Monitor/ITSM connections on every playbook), keyed by managed API name. Merged under each workflow's own connections (same-key workflow entries win); a workflow opts out with use\_shared\_connections = false. | <pre>map(object({<br/>    connection_id         = string<br/>    connection_name       = optional(string)<br/>    managed_api_id        = string<br/>    managed_identity_auth = optional(bool, false)<br/>  }))</pre> | `{}` | no |

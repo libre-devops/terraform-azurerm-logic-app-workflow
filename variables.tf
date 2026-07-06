@@ -1,7 +1,9 @@
-variable "diagnostics_log_analytics_workspace_id" {
-  description = "When set, every workflow gets an allLogs diagnostic setting to this workspace (named diag-<workflow>) unless it sets its own diagnostics or opts out with diagnostics_enabled = false."
-  type        = string
-  default     = null
+variable "diagnostics" {
+  description = "Module-level default diagnostics: when set, every workflow gets an allLogs diagnostic setting to this workspace (named diag-<workflow>) unless it sets its own diagnostics or opts out with diagnostics_enabled = false. An object rather than a bare string so its presence stays plan-known when the workspace is created in the same apply (for_each keys must never depend on unknown values)."
+  type = object({
+    log_analytics_workspace_id = string
+  })
+  default = null
 }
 
 variable "location" {

@@ -43,7 +43,7 @@ What the shell earns:
   them by key, and `use_shared_connections = false` opts out. The module generates the entire
   `$connections` parameter pair, including the `ManagedServiceIdentity` authentication block, byte
   compatible with `@parameters('$connections')['<api>']['connectionId']` references.
-- **Diagnostics declared once**: `diagnostics_log_analytics_workspace_id` gives every workflow an
+- **Diagnostics declared once**: `diagnostics` gives every workflow an
   allLogs diagnostic setting named `diag-<workflow>`, with per-workflow override and opt-out.
 - **The hidden-title tag is required**: `title` becomes the portal subtitle, as the standard
   mandates.
@@ -86,7 +86,7 @@ module "playbooks" {
       managed_identity_auth = true
     }
   }
-  diagnostics_log_analytics_workspace_id = module.law.workspace_ids["log-ldo-uks-prd-001"]
+  diagnostics = { log_analytics_workspace_id = module.law.workspace_ids["log-ldo-uks-prd-001"] }
 
   workflows = local.playbooks
 }

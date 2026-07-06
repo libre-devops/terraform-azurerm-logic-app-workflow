@@ -98,7 +98,7 @@ module "logic_app_workflow" {
   location          = local.location
   tags              = module.tags.tags
 
-  diagnostics_log_analytics_workspace_id = module.law.workspace_ids[local.law_name]
+  diagnostics = { log_analytics_workspace_id = module.law.workspace_ids[local.law_name] }
 
   # The estate default: one shared Sentinel connection every playbook in the call inherits.
   shared_connections = {

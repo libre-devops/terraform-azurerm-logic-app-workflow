@@ -262,7 +262,7 @@ run "shared_plumbing_defaults" {
         managed_identity_auth = true
       }
     }
-    diagnostics_log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.OperationalInsights/workspaces/log-ldo-uks-tst-01"
+    diagnostics = { log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.OperationalInsights/workspaces/log-ldo-uks-tst-01" }
 
     workflows = {
       "logic-ldo-uks-tst-01" = {

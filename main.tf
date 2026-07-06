@@ -167,10 +167,12 @@ resource "azurerm_logic_app_workflow" "this" {
 # The per-workflow diagnostic setting (allLogs to Log Analytics) every production playbook carries;
 # named diag-<workflow> per the naming convention unless overridden.
 resource "azurerm_monitor_diagnostic_setting" "this" {
+  # The filter checks OBJECT presence (plan-known), never the workspace id value (unknown when the
+  # workspace is created in the same apply): for_each keys must stay plan-known.
   for_each = {
     for k, w in var.workflows : k => (
-      w.diagnostics != null ? w.diagnostics : { log_analytics_workspace_id = var.diagnostics_log_analytics_workspace_id, name = null }
-    ) if w.diagnostics_enabled && (w.diagnostics != null || var.diagnostics_log_analytics_workspace_id != null)
+      w.diagnostics != null ? w.diagnostics : { log_analytics_workspace_id = var.diagnostics.log_analytics_workspace_id, name = null }
+    ) if w.diagnostics_enabled && (w.diagnostics != null || var.diagnostics != null)
   }
 
   name                       = coalesce(each.value.name, "diag-${each.key}")
