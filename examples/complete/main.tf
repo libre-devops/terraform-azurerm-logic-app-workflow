@@ -252,6 +252,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_storm" {
 
   auto_mitigation_enabled = false
 
+  # A freshly onboarded Sentinel workspace has no SecurityIncident table until the
+  # SecurityInsights solution provisions it (or the first incident lands), and Azure validates
+  # the KQL against the live workspace schema at rule-create time, so a same-apply rule fails
+  # with "Failed to resolve table or column expression named 'SecurityIncident'" (proven live).
+  skip_query_validation = true
+
   action {
     action_groups = [module.action_group.ids[local.ag_name]]
   }
