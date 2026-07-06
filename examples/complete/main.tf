@@ -58,9 +58,6 @@ resource "azapi_resource" "sentinel_connection" {
   schema_validation_enabled = false
 
   body = {
-    # V2 is the connections runtime that supports access policies (V1 rejects them with
-    # InvalidApiConnectionAccessPolicy, proven live) and is what Sentinel playbooks use.
-    kind = "V2"
     properties = {
       displayName        = local.conn_name
       parameterValueType = "Alternative"
@@ -71,28 +68,12 @@ resource "azapi_resource" "sentinel_connection" {
   }
 }
 
-# The access policy is what lets the workflow's managed identity use the connection at runtime.
-resource "azapi_resource" "sentinel_connection_access" {
-  type = "Microsoft.Web/connections/accessPolicies@2016-06-01"
-  # Access policies are named by the principal object id, not a friendly name (the API rejects
-  # anything else on read).
-  name                      = module.logic_app_workflow.identities[local.logic_name].principal_id
-  parent_id                 = azapi_resource.sentinel_connection.id
-  location                  = local.location
-  schema_validation_enabled = false
-
-  body = {
-    properties = {
-      principal = {
-        type = "ActiveDirectory"
-        identity = {
-          tenantId = module.logic_app_workflow.identities[local.logic_name].tenant_id
-          objectId = module.logic_app_workflow.identities[local.logic_name].principal_id
-        }
-      }
-    }
-  }
-}
+# NOTE, proven live both ways: V1 connections reject access policies
+# (InvalidApiConnectionAccessPolicy) and Consumption workflows reject V2 connections
+# (WorkflowInvalidApiConnectionV2). So on Consumption there is NO access policy resource at all:
+# managed identity auth flows through the connection's parameterValueType "Alternative" plus the
+# $connections connectionProperties block the module generates. Access policies belong to
+# Standard-hosted logic apps.
 
 # The alert-storm playbook: the workflow shell from this module (typed parameters, hidden-title,
 # diagnostics), content as raw resources below, per the Libre DevOps Logic App standard.
