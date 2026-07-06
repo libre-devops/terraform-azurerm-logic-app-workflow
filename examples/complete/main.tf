@@ -58,6 +58,9 @@ resource "azapi_resource" "sentinel_connection" {
   schema_validation_enabled = false
 
   body = {
+    # V2 is the connections runtime that supports access policies (V1 rejects them with
+    # InvalidApiConnectionAccessPolicy, proven live) and is what Sentinel playbooks use.
+    kind = "V2"
     properties = {
       displayName        = local.conn_name
       parameterValueType = "Alternative"
