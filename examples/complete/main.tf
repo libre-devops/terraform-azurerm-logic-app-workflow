@@ -70,8 +70,10 @@ resource "azapi_resource" "sentinel_connection" {
 
 # The access policy is what lets the workflow's managed identity use the connection at runtime.
 resource "azapi_resource" "sentinel_connection_access" {
-  type                      = "Microsoft.Web/connections/accessPolicies@2016-06-01"
-  name                      = local.logic_name
+  type = "Microsoft.Web/connections/accessPolicies@2016-06-01"
+  # Access policies are named by the principal object id, not a friendly name (the API rejects
+  # anything else on read).
+  name                      = module.logic_app_workflow.identities[local.logic_name].principal_id
   parent_id                 = azapi_resource.sentinel_connection.id
   location                  = local.location
   schema_validation_enabled = false
@@ -259,7 +261,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_storm" {
       | summarize IncidentCount = dcount(IncidentNumber)
     KQL
     time_aggregation_method = "Total"
-    metric_measure_column   = null
+    metric_measure_column   = "IncidentCount"
     operator                = "GreaterThan"
     threshold               = var.storm_threshold
   }
