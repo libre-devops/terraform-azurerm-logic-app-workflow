@@ -242,7 +242,7 @@ module "action_group" {
 # parameters so both sides stay in lockstep from one Terraform variable.
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_storm" {
   name                = "Alert_storm_-_SecurityIncident_volume_over_threshold"
-  resource_group_name = module.rg.resource_group_name
+  resource_group_name = local.rg_name
   location            = local.location
   tags                = module.tags.tags
 
