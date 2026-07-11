@@ -70,7 +70,12 @@ locals {
           id             = c.managed_api_id
         },
         c.managed_identity_auth ? {
-          connectionProperties = { authentication = { type = "ManagedServiceIdentity" } }
+          connectionProperties = {
+            authentication = merge(
+              { type = "ManagedServiceIdentity" },
+              wf.connections_identity_id != null ? { identity = wf.connections_identity_id } : {},
+            )
+          }
         } : {},
       )
     }) if length(local.effective_connections[wf_name]) > 0

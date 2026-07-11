@@ -229,6 +229,42 @@ run "connections_generate_parameter" {
   }
 }
 
+# A workflow on a user assigned identity must NAME it inside every managed identity authenticated
+# connection (a bare block means SystemAssigned and the platform rejects it at run time when no
+# system identity exists: InvalidWorkflowManagedIdentitySpecified, caught live in azure-soc).
+run "connections_identity_named_for_user_assigned" {
+  command = plan
+
+  expect_failures = [check.trigger_access_control_is_visible]
+
+  variables {
+    workflows = {
+      "logic-ldo-uks-tst-01" = {
+        title = "Sentinel Incident - route on a user assigned identity"
+
+        identity = {
+          type         = "UserAssigned"
+          identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-ldo-uks-tst-01"]
+        }
+        connections_identity_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-ldo-uks-tst-01"
+
+        connections = {
+          "azuresentinel" = {
+            connection_id         = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.Web/connections/conn-sentinel-ldo-uks-tst-01"
+            managed_api_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Web/locations/uksouth/managedApis/azuresentinel"
+            managed_identity_auth = true
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = jsondecode(azurerm_logic_app_workflow.this["logic-ldo-uks-tst-01"].parameters["$connections"])["azuresentinel"].connectionProperties.authentication.identity == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-ldo-uks-tst-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-ldo-uks-tst-01"
+    error_message = "connections_identity_id should be stamped as the identity inside the ManagedServiceIdentity authentication block."
+  }
+}
+
 # Validation: declaring $connections yourself while the module generates it is rejected.
 run "rejects_manual_connections_parameter" {
   command = plan

@@ -92,6 +92,12 @@ variable "workflows" {
       allowed_values = optional(list(string))
     })), {})
 
+    # Names the user assigned identity (by resource id) inside every managed identity
+    # authenticated connection's connectionProperties. REQUIRED when the workflow runs as a user
+    # assigned identity: a bare authentication block means SystemAssigned, and the platform
+    # rejects it (InvalidWorkflowManagedIdentitySpecified) when no system identity exists.
+    connections_identity_id = optional(string)
+
     connections = optional(map(object({
       connection_id         = string
       connection_name       = optional(string)
